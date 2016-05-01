@@ -340,7 +340,7 @@ class NM_WPRegistration extends NM_Framwork_V1_wpregistration{
 			//$msg = str_replace("%USER_LOGIN%", $nm_email, $msg);
 			$msg = str_replace("%USER_PASSWORD%", $pwd, $msg);
 			$msg = str_replace("%SITE_NAME%", $site_title, $msg);
-			$msg .= '<p><a href="' . wp_login_url() . '" title="Login">Click here to login</a>';
+			$msg .= '<p><a href="' . esc_url(home_url('/login')) . '" title="Login">Click here to login</a>'; // TODO: workaround
 			$msg = str_replace("\n", "<br />", $msg);
 
 			if(wp_mail($wp_registration_email, $suject, $msg, $headers)){
