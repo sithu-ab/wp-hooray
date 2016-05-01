@@ -67,8 +67,8 @@ add_action('init', 'hooray_create_posttype', 0);
 function hooray_nav_menu_items($items, $args)
 {
 	if ($args->theme_location == 'primary') {
-		$url = esc_url(home_url('/feedback'));
-		$items .= '<li class="feedback-corner"><a href="' . $url . '">' . __('Feedback Corner') . '</a></li>';
+		$items .= '<li class="feedback-corner"><a href="' . esc_url(home_url('/feedback')) . '">' . __('Feedback Corner') . '</a></li>';
+		$items .= '<li class="submit-feedback"><a href="' . esc_url(home_url('/submit-feedback')) . '">' . __('Submit Feedback') . '</a></li>';
 	}
 
 	return $items;
