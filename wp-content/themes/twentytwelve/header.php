@@ -37,6 +37,12 @@
 		<hgroup>
 			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
 			<h2 class="site-description"><?php bloginfo( 'description' ); ?></h2>
+			<?php if (is_user_logged_in()) { ?>
+				<a href="<?php echo wp_logout_url(home_url()); ?>"><?php echo __( 'Logout', 'twentytwelve' ); ?></a>
+			<?php } else { ?>
+				<a href="<?php echo esc_url(home_url('/register')); ?>"><?php echo __( 'Register', 'twentytwelve' ); ?></a> |
+				<a href="<?php echo esc_url(home_url('/login')); ?>"><?php echo __( 'Login', 'twentytwelve' ); ?></a>
+			<?php } ?>
 		</hgroup>
 
 		<nav id="site-navigation" class="main-navigation" role="navigation">
