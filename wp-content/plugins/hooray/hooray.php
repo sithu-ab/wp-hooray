@@ -74,3 +74,6 @@ function hooray_nav_menu_items($items, $args)
 	return $items;
 }
 add_filter('wp_nav_menu_items', 'hooray_nav_menu_items', 10, 2);
+
+// Hide Admin bar for all front-end pages
+show_admin_bar(false);
