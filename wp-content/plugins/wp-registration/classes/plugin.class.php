@@ -388,8 +388,11 @@ class NM_WPRegistration extends NM_Framwork_V1_wpregistration{
 			$reset_password_msg = ($reset_password_msg == '' ? 'Your new password is ' : $reset_password_msg);
 			$reset_password_msg .= $password;
 			
-			$headers [] = "Content-Type: text/html";
-			
+			// TODO: workaround for password reset mail not sent
+			$headers[] = "From: ".get_bloginfo()." <".get_bloginfo('admin_email').">";
+			$headers[] = "Content-Type: text/html";
+			$headers[] = "MIME-Version: 1.0\r\n";
+
 			//$msg = $this -> get_option('_reset_password');
 			
 			//$msg = str_replace("%USER_PASSWORD%", $password, $msg);
