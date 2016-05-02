@@ -21,3 +21,9 @@ Just a Wordpress tutorial site
 - Checkout the branch `master`.
 - Create a new file `wp-config.php` and paste the previously copied content into it.
 - Update your database settings of `wp-config.php` according to your credentials.
+
+## Finishing Up
+
+- Browse [http://localhost/wp-hooray/wp-admin](http://localhost/wp-hooray/wp-admin)
+- Login with username `admin` and password `admin`.
+- Go to the menu `Settings -> Permalinks` just one time to update `.htaccess`.
