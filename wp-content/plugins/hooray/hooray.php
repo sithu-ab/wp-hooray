@@ -75,6 +75,112 @@ function hooray_nav_menu_items($items, $args)
 }
 add_filter('wp_nav_menu_items', 'hooray_nav_menu_items', 10, 2);
 
+/***************/
+/* User Module */
+/***************/
+
+function hooray_get_page_meta()
+{
+	return array(
+		'hooray-wp-registration' => array(
+			'name'  => 'hooray_registration',
+			'title' => 'Hooray User Registration',
+			'slug'  => 'register',
+		),
+		'hooray-wp-registration-success' => array(
+			'name'  => 'hooray_registration_success',
+			'title' => 'Hooray User Registration Success',
+			'slug'  => 'register-success',
+		),
+		'hooray-wp-login' => array(
+			'name'  => 'hooray_registration_login',
+			'title' => 'Hooray User Log In',
+			'slug'  => 'login',
+		),
+	);
+}
+
+/**
+ * When the plugin is activated
+ */
+function hooray_install()
+{
+	hooray_page_install('hooray-wp-registration');
+	hooray_page_install('hooray-wp-registration-success');
+	hooray_page_install('hooray-wp-login');
+}
+
+/**
+ * When the plugin is deactivated
+ */
+function hooray_remove()
+{
+	$pages = hooray_get_page_meta();
+	foreach ($pages as $p) {
+		$name = $p[$shortcode]['name'];
+
+		$the_page_id = get_option("{$name}_page_id");
+		if($the_page_id) {
+			wp_delete_post($the_page_id); // this will trash, not delete
+		}
+
+		delete_option("{$name}_page_title");
+		delete_option("{$name}_page_slug");
+		delete_option("{$name}_page_id");
+	}
+}
+
+/**
+ * Install necessary pages with shortcodes for user module
+ * @param string $shortcode Shortcode
+ */
+function hooray_page_install($shortcode)
+{
+	$pages = hooray_get_page_meta();
+	$name  = $pages[$shortcode]['name'];
+	$title = $pages[$shortcode]['title'];
+	$slug  = $pages[$shortcode]['slug'];
+
+	// the menu entry...
+	delete_option("{$name}_page_title");
+	add_option("{$name}_page_title", $title, '', 'yes');
+	// the slug...
+	delete_option("{$name}_page_slug");
+	add_option("{$name}_page_slug", $slug, '', 'yes');
+	// the id...
+	delete_option("{$name}_page_id");
+	add_option("{$name}_page_id", '0', '', 'yes');
+
+	$the_page = get_page_by_title($title);
+
+	if (!$the_page) {
+		// Create post object
+		$page = array();
+		$page['post_title']     = $title;
+		$page['post_name']      = $slug;
+		$page['post_content']   = "[{$shortcode}]";
+		$page['post_status']    = 'publish';
+		$page['post_type']      = 'page';
+		$page['comment_status'] = 'closed';
+		$page['ping_status']    = 'closed';
+		$page['post_category']  = array(1); // the default 'Uncategorised'
+
+		// Insert the post into the database
+		$the_page_id = wp_insert_post($page);
+	}
+	else {
+		// the plugin may have been previously active and the page may just be trashed...
+		$the_page_id = $the_page->ID;
+
+		//make sure the page is not trashed...
+		$the_page->post_status = 'publish';
+		$the_page_id = wp_update_post($the_page);
+	}
+
+	delete_option("{$name}_page_id");
+	add_option("{$name}_page_id", $the_page_id);
+}
+
 /**
  * Render user registration form
  */
@@ -114,6 +220,8 @@ function render_shortcode_registration() {
 				'nickname'       => $user_nickname,
 				'show_admin_bar_front' => 'false',
 			);
+
+			register_new_user($user_login, $user_email);
 
 			$result = wp_insert_user($userdata);
 
@@ -162,6 +270,11 @@ function render_shortcode_registration() {
 	include_once ('templates/user-registration.php');
 }
 
+function hooray_validate_custom_fields($errors, $sanitized_user_login, $user_email)
+{
+
+}
+
 /**
  * Render successful registration page
  */
@@ -169,6 +282,13 @@ function render_shortcode_registration_success() {
 	include_once ('templates/registration-success.php');
 }
 
+// Runs when plugin is activated
+register_activation_hook(__FILE__, 'hooray_install');
+// Runs on plugin deactivation
+register_deactivation_hook( __FILE__, 'hooray_remove' );
+// Register shortcode for user registration form
 add_shortcode('hooray-wp-registration', 'render_shortcode_registration');
+// Register shortcode for user registration success page
 add_shortcode('hooray-wp-registration-success', 'render_shortcode_registration_success');
-
+// Validate custom fields on user registration page
+add_filter('registration_errors', 'hooray_validate_custom_fields', 10, 3);
